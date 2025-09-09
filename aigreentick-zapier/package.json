@@ -1,0 +1,34 @@
+{
+  "name": "aigreentick-zapier",
+  "version": "1.0.0",
+  "description": "aiGreenTick integration for Zapier - WhatsApp Business API automation",
+  "main": "index.js",
+  "scripts": {
+    "test": "zapier test",
+    "build": "zapier build",
+    "push": "zapier push",
+    "validate": "zapier validate"
+  },
+  "dependencies": {
+    "zapier-platform-core": "17.7.0"
+  },
+  "devDependencies": {
+    "mocha": "^11.7.2",
+    "should": "^13.2.3"
+  },
+  "zapier": {
+    "description": "AIGreenTick is a messaging automation tool that connects your workflows to apps effortlessly.",
+    "logo": "https://aigreentick.com/logo.png",
+    "homepageUrl": "https://aigreentick.com",
+    "brandColor": "#00bfa5"
+  },
+  "keywords": [
+    "zapier",
+    "aigreentick",
+    "whatsapp",
+    "messaging",
+    "automation"
+  ],
+  "author": "Jatin Singh",
+  "license": "MIT"
+}

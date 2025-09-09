@@ -1,0 +1,36 @@
+{
+  "name": "aigreentick",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "zapier test",
+    "build": "zapier build",
+    "push": "zapier push",
+    "validate": "zapier validate"
+  },
+  "dependencies": {
+    "zapier-platform-core": "17.7.0"
+  },
+  "devDependencies": {
+    "jest": "^30.1.3",
+    "mocha": "^11.7.2",
+    "should": "^13.2.3"
+  },
+  "private": true,
+  "main": "index.js",
+  "zapier": {
+    "description": "AIGreenTick is a messaging automation tool that connects your workflows to apps effortlessly.",
+    "logo": "https://aigreentick.com/logo.png",
+    "homepageUrl": "https://aigreentick.com",
+    "brandColor": "#00bfa5"
+  },
+  "keywords": [
+    "zapier",
+    "aigreentick",
+    "whatsapp",
+    "messaging",
+    "automation"
+  ],
+  "author": "Jatin Singh",
+  "license": "MIT"
+}
