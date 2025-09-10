@@ -29,6 +29,6 @@ zapier scaffold trigger contact
 
 # Add an action
 zapier scaffold create contact
-``` 
+```
 
 Find out more on the latest docs: https://github.com/zapier/zapier-platform/blob/main/packages/cli/README.md.

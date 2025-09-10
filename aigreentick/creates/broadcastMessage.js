@@ -1,6 +1,23 @@
 const performBroadcastMessage = async (z, bundle) => {
-  // Parse mobile numbers
-  let mobile_numbers;
+
+  const dashboardResp = await z.request({
+    method: 'GET',
+    url: 'https://aigreentick.com/api/v1/dashboard',
+    headers: {
+      Authorization: `Bearer ${bundle.authData.api_token}`,
+      Accept: 'application/json',
+    },
+  });
+
+  if (dashboardResp.status !== 200) {
+    throw new Error(`Failed to fetch dashboard: ${dashboardResp.status}`);
+  }
+
+  const dashboardData = dashboardResp.json.data || {};
+  const user = dashboardData.user || {};
+  const country_id = user.country_id;
+
+  let mobile_numbers = [];
   if (typeof bundle.inputData.mobile_numbers === 'string') {
     mobile_numbers = bundle.inputData.mobile_numbers
       .split(',')
@@ -9,11 +26,12 @@ const performBroadcastMessage = async (z, bundle) => {
   } else {
     mobile_numbers = bundle.inputData.mobile_numbers || [];
   }
+  z.console.log('Parsed mobile numbers:', mobile_numbers);
 
   // Fetch template details
   const templateResp = await z.request({
     method: 'GET',
-    url: `https://aigreentick.com/api/v1/templates/${bundle.inputData.template_id}`,
+    url: `https://aigreentick.com/api/v1/wa-templates/${bundle.inputData.template_id}`,
     headers: {
       Authorization: `Bearer ${bundle.authData.api_token}`,
       Accept: 'application/json',
@@ -21,11 +39,8 @@ const performBroadcastMessage = async (z, bundle) => {
   });
 
   const template = templateResp.json || {};
-  let is_media = false;
-  let media_type = '';
-  let media_url = '';
+  let is_media = false, media_type = '', media_url = '';
 
-  // Detect media from template components
   if (template.components && Array.isArray(template.components)) {
     const header = template.components.find(c => c.type === 'HEADER');
     if (header) {
@@ -45,15 +60,6 @@ const performBroadcastMessage = async (z, bundle) => {
     }
   }
 
-  // Allow user override if provided in Zap input
-  if (bundle.inputData.media_type) media_type = bundle.inputData.media_type;
-  if (bundle.inputData.media_url) media_url = bundle.inputData.media_url;
-  if (media_type && media_url) is_media = true;
-
-  // Inject country_id from auth if not provided manually
-  const country_id = bundle.authData.country_id;
-
-  // Build request payload
   const body = {
     template_id: bundle.inputData.template_id,
     country_id,
@@ -65,6 +71,12 @@ const performBroadcastMessage = async (z, bundle) => {
     schedule_date: bundle.inputData.schedule_date || '',
     variables: bundle.inputData.variables || '',
   };
+
+  z.console.log('Broadcast request body:', JSON.stringify(body, null, 2));
+
+  if (!country_id) {
+    throw new Error('country_id is missing from dashboard data. Please verify your account.');
+  }
 
   const response = await z.request({
     method: 'POST',
@@ -78,7 +90,6 @@ const performBroadcastMessage = async (z, bundle) => {
   });
 
   const result = response.json;
-
   return {
     ...result,
     is_media,
@@ -144,7 +155,6 @@ const broadcastMessage = {
     ]
   }
 };
-
 
 module.exports = {
   performBroadcastMessage,
