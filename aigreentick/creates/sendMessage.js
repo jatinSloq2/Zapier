@@ -1,5 +1,3 @@
-// creates/sendMessage.js (CommonJS)
-
 const performSendMessage = async (z, bundle) => {
   const response = await z.request({
     method: 'POST',

@@ -1,5 +1,4 @@
 const testAuth = async (z, bundle) => {
-  // Test the authentication by making a request to dashboard
   const response = await z.request({
     method: 'GET',
     url: 'https://aigreentick.com/api/v1/dashboard',
@@ -14,22 +13,22 @@ const testAuth = async (z, bundle) => {
     throw new Error('Authentication failed. Please check your API token.');
   }
 
-  return response.data;
+  const data = response.json.data;
+
+  return {
+    balance: data.balance,
+    ...data.user,
+  };
 };
 
 module.exports = {
   type: 'custom',
   fields: [
     {
-      computed: false,
-      key: 'api_token',
-      required: true,
-      label: 'API Token',
-      type: 'string',
-      helpText: 'Your aiGreenTick API token from the dashboard. Get it from https://aigreentick.com/dashboard/api',
+      key: 'api_token', required: true, label: 'API Token', type: 'string',
+      helpText: 'Your Aigreentick API token from the dashboard. Get it from your account settings.',
     },
   ],
   test: testAuth,
-  // Updated connection label to match the actual response structure
-  connectionLabel: '{{user.name}} - {{user.email}}',
+  connectionLabel: '{{name}} - {{email}} (Balance: {{balance}})',
 };

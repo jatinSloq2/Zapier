@@ -1,21 +1,5 @@
-const getCountries = async (z, bundle) => {
-  const response = await z.request({
-    method: 'GET',
-    url: 'https://aigreentick.com/api/v1/country',
-    headers: {
-      Authorization: `Bearer ${bundle.authData.api_token}`,
-      Accept: 'application/json',
-    },
-  });
-
-  return response.json.success.map((country) => ({
-    id: country.id,
-    name: `${country.name} (+${country.mobile_code})`,
-  }));
-};
-
 const performBroadcastMessage = async (z, bundle) => {
-  // Parse mobile numbers (can be comma-separated string or array)
+  // Parse mobile numbers
   let mobile_numbers;
   if (typeof bundle.inputData.mobile_numbers === 'string') {
     mobile_numbers = bundle.inputData.mobile_numbers
@@ -26,6 +10,62 @@ const performBroadcastMessage = async (z, bundle) => {
     mobile_numbers = bundle.inputData.mobile_numbers || [];
   }
 
+  // Fetch template details
+  const templateResp = await z.request({
+    method: 'GET',
+    url: `https://aigreentick.com/api/v1/templates/${bundle.inputData.template_id}`,
+    headers: {
+      Authorization: `Bearer ${bundle.authData.api_token}`,
+      Accept: 'application/json',
+    },
+  });
+
+  const template = templateResp.json || {};
+  let is_media = false;
+  let media_type = '';
+  let media_url = '';
+
+  // Detect media from template components
+  if (template.components && Array.isArray(template.components)) {
+    const header = template.components.find(c => c.type === 'HEADER');
+    if (header) {
+      if (header.format === 'IMAGE' && header.image_url) {
+        is_media = true;
+        media_type = 'IMAGE';
+        media_url = header.image_url;
+      } else if (header.format === 'VIDEO' && header.video_url) {
+        is_media = true;
+        media_type = 'VIDEO';
+        media_url = header.video_url;
+      } else if (header.format === 'DOCUMENT' && header.document_url) {
+        is_media = true;
+        media_type = 'DOCUMENT';
+        media_url = header.document_url;
+      }
+    }
+  }
+
+  // Allow user override if provided in Zap input
+  if (bundle.inputData.media_type) media_type = bundle.inputData.media_type;
+  if (bundle.inputData.media_url) media_url = bundle.inputData.media_url;
+  if (media_type && media_url) is_media = true;
+
+  // Inject country_id from auth if not provided manually
+  const country_id = bundle.authData.country_id;
+
+  // Build request payload
+  const body = {
+    template_id: bundle.inputData.template_id,
+    country_id,
+    camp_name: bundle.inputData.camp_name || 'Default Campaign',
+    mobile_numbers,
+    is_media,
+    media_type,
+    media_url,
+    schedule_date: bundle.inputData.schedule_date || '',
+    variables: bundle.inputData.variables || '',
+  };
+
   const response = await z.request({
     method: 'POST',
     url: 'https://aigreentick.com/api/v1/broadcast',
@@ -34,23 +74,16 @@ const performBroadcastMessage = async (z, bundle) => {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      template_id: bundle.inputData.template_id,
-      country_id: bundle.inputData.country_id,
-      camp_name: bundle.inputData.camp_name || '',
-      mobile_numbers,
-      is_media: bundle.inputData.is_media || false,
-      media_type: bundle.inputData.media_type || '',
-      media_url: bundle.inputData.media_url || '',
-      schedule_date: bundle.inputData.schedule_date || '',
-      variables: bundle.inputData.variables || '',
-    }),
+    body: JSON.stringify(body),
   });
 
   const result = response.json;
 
   return {
     ...result,
+    is_media,
+    media_type,
+    media_url,
     mobile_numbers_count: mobile_numbers.length,
     mobile_numbers,
   };
@@ -83,14 +116,6 @@ const broadcastMessage = {
         helpText: 'Comma-separated list of mobile numbers (with country codes)'
       },
       {
-        key: 'country_id',
-        label: 'Country',
-        type: 'string',
-        required: true,
-        dynamic: 'getCountries.id.name',
-        helpText: 'Select the country for the recipients'
-      },
-      {
         key: 'variables',
         label: 'Template Variables',
         type: 'string',
@@ -104,35 +129,6 @@ const broadcastMessage = {
         required: false,
         helpText: 'Name for this broadcast campaign'
       },
-      {
-        key: 'is_media',
-        label: 'Include Media',
-        type: 'boolean',
-        required: false,
-        helpText: 'Whether to include media with the template'
-      },
-      {
-        key: 'media_type',
-        label: 'Media Type',
-        type: 'string',
-        required: false,
-        choices: ['IMAGE', 'VIDEO', 'DOCUMENT'],
-        helpText: 'Type of media to include'
-      },
-      {
-        key: 'media_url',
-        label: 'Media URL',
-        type: 'string',
-        required: false,
-        helpText: 'URL of the media to include'
-      },
-      {
-        key: 'schedule_date',
-        label: 'Schedule Date',
-        type: 'datetime',
-        required: false,
-        helpText: 'Schedule the broadcast for later'
-      }
     ],
 
     sample: {
@@ -149,8 +145,8 @@ const broadcastMessage = {
   }
 };
 
+
 module.exports = {
-  getCountries,
   performBroadcastMessage,
   broadcastMessage,
 };
