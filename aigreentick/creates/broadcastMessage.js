@@ -27,8 +27,6 @@ const performBroadcastMessage = async (z, bundle) => {
     mobile_numbers = bundle.inputData.mobile_numbers || [];
   }
   z.console.log('Parsed mobile numbers:', mobile_numbers);
-
-  // Fetch template details
   const templateResp = await z.request({
     method: 'GET',
     url: `https://aigreentick.com/api/v1/wa-templates/${bundle.inputData.template_id}`,
