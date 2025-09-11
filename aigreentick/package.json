@@ -19,7 +19,7 @@
   "private": true,
   "main": "index.js",
   "zapier": {
-    "description": "AIGreenTick is a messaging automation tool that connects your workflows to apps effortlessly.",
+    "description": "Aigreentick is a messaging automation tool that connects your workflows to apps effortlessly.",
     "logo": "https://aigreentick.com/logo.png",
     "homepageUrl": "https://aigreentick.com",
     "brandColor": "#00bfa5"
