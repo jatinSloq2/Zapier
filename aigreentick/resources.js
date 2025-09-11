@@ -39,29 +39,3 @@ const getTemplates = {
   },
 };
 
-const getCountries = {
-  key: 'getCountries',
-  noun: 'Country',
-  list: {
-    display: {
-      label: 'List Countries',
-      description: 'Triggers when countries are available.',
-    },
-    operation: {
-      perform: async () => [
-        { id: '98', name: 'India' },
-        { id: '1', name: 'USA' },
-      ],
-      sample: { id: '98', name: 'India' },
-      outputFields: [
-        { key: 'id', label: 'Country ID', type: 'string' },
-        { key: 'name', label: 'Country Name', type: 'string' },
-      ],
-    },
-  },
-};
-
-module.exports = {
-  getTemplates,
-  getCountries,
-};

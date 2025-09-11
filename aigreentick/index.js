@@ -4,8 +4,7 @@ const zapier = require('zapier-platform-core');
 const authentication = require('./authentication');
 const triggers = require('./triggers/index');
 const creates = require('./creates/index.js');
-const { getTemplates, getCountries } = require('./resources');
-const { templatesSearch, countriesSearch } = require('./searches');
+const { getTemplates } = require('./resources');
 
 
 module.exports = {
@@ -29,8 +28,4 @@ module.exports = {
     [getCountries.key]: getCountries,
   },
 
-  searches: {
-    [templatesSearch.key]: templatesSearch,
-    [countriesSearch.key]: countriesSearch,
-  },
 };

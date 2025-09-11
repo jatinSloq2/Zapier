@@ -1,5 +1,3 @@
-// triggers/newIncomingMessage.js (CommonJS)
-
 const triggerNewIncomingMessage = async (z, bundle) => {
   const response = await z.request({
     method: 'GET',
@@ -37,32 +35,32 @@ const triggerNewIncomingMessage = async (z, bundle) => {
     }));
 };
 
-// Optional webhook version (commented out for now)
-const triggerNewIncomingMessageHook = async (z, bundle) => {
-  const data = bundle.cleanedRequest;
+// // Optional webhook version (commented out for now)
+// const triggerNewIncomingMessageHook = async (z, bundle) => {
+//   const data = bundle.cleanedRequest;
 
-  if (data.type === 'recieve') {
-    return [
-      {
-        id: data.id,
-        contact_id: data.contact_id,
-        contact_name: data.send_from_id,
-        contact_mobile: data.send_from,
-        message: data.text,
-        message_type: data.method,
-        timestamp: data.time,
-        message_id: data.message_id,
-        created_at: data.created_at,
-        sender_name: data.send_from_id,
-        receiver_name: data.send_to_id,
-        status: data.status,
-        is_media: data.is_media === '1',
-      },
-    ];
-  }
+//   if (data.type === 'recieve') {
+//     return [
+//       {
+//         id: data.id,
+//         contact_id: data.contact_id,
+//         contact_name: data.send_from_id,
+//         contact_mobile: data.send_from,
+//         message: data.text,
+//         message_type: data.method,
+//         timestamp: data.time,
+//         message_id: data.message_id,
+//         created_at: data.created_at,
+//         sender_name: data.send_from_id,
+//         receiver_name: data.send_to_id,
+//         status: data.status,
+//         is_media: data.is_media === '1',
+//       },
+//     ];
+//   }
 
-  return [];
-};
+//   return [];
+// };
 
 module.exports = {
   key: 'newIncomingMessage',
@@ -74,10 +72,8 @@ module.exports = {
   },
 
   operation: {
-    type: 'polling', // change to 'hook' if you implement webhooks
+    type: 'polling',
     perform: triggerNewIncomingMessage,
-    // performSubscribe: triggerNewIncomingMessageHook, // For webhooks
-    // performUnsubscribe: unsubscribeHook, // For webhooks
 
     inputFields: [
       {
