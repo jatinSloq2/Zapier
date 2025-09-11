@@ -39,3 +39,4 @@ const getTemplates = {
   },
 };
 
+module.exports = { getTemplates };

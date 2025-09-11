@@ -11,7 +11,7 @@ const performSendMessage = async (z, bundle) => {
     // Step 2: Fetch raw binary back
     const fileResp = await z.request({
       url: fileUrl,
-      raw: true, // get binary content
+      raw: true,
     });
 
     // Step 3: Upload to Aigreentick API as form-data
@@ -92,7 +92,7 @@ module.exports = {
       { key: 'channel', label: 'Channel', type: 'string', required: true },
       { key: 'reaction', label: 'Reaction', type: 'string', required: false },
       { key: 'isReply', label: 'Is Reply', type: 'boolean', required: false },
-      { key: 'file', label: 'Media File', type: 'file', required: false, helpText: 'Upload an image/video/document.' },
+      { key: 'file', label: 'Media File', type: 'file', required: false, helpText: 'Upload a file manually or select from a previous step.', placeholder: 'Upload or map dynamically' },
     ],
 
     sample: {
