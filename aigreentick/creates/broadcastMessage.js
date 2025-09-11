@@ -25,23 +25,35 @@ const parseTemplate = (template) => {
 
   for (const c of template.components) {
     if (c.type === 'HEADER') {
-      if (c.format === 'TEXT') preview += `Header: ${c.text}\n`;
+      if (c.format === 'TEXT') {
+        preview += `Header: ${c.text}\n`;
+      }
       if (c.format === 'IMAGE' && c.image_url) {
         is_media = true; media_type = 'IMAGE'; media_url = c.image_url;
+        preview += `Header (Image): ${c.image_url}\n`;
       }
       if (c.format === 'VIDEO' && c.video_url) {
         is_media = true; media_type = 'VIDEO'; media_url = c.video_url;
+        preview += `Header (Video): ${c.video_url}\n`;
       }
       if (c.format === 'DOCUMENT' && c.document_url) {
         is_media = true; media_type = 'DOCUMENT'; media_url = c.document_url;
+        preview += `Header (Document): ${c.document_url}\n`;
       }
     }
-    if (c.type === 'BODY') preview += `Body: ${c.text}\n`;
-    if (c.type === 'FOOTER') preview += `Footer: ${c.text}\n`;
+
+    if (c.type === 'BODY') {
+      preview += `Body: ${c.text}\n`;
+    }
+
+    if (c.type === 'FOOTER') {
+      preview += `Footer: ${c.text}\n`;
+    }
   }
 
   return { preview, is_media, media_type, media_url };
 };
+
 
 // ---------- Perform ----------
 const performBroadcastMessage = async (z, bundle) => {
@@ -63,6 +75,14 @@ const performBroadcastMessage = async (z, bundle) => {
   const template = await fetchApi(z, `https://aigreentick.com/api/v1/wa-templates/${bundle.inputData.template_id}`, token);
   const { preview: template_preview, is_media, media_type, media_url } = parseTemplate(template);
 
+  const vars = Object.keys(bundle.inputData)
+    .filter(k => k.startsWith('var_'))
+    .map(k => bundle.inputData[k])
+    .filter(Boolean);
+
+  const variables = vars.join(',');
+
+
   // Request body
   const body = {
     template_id: bundle.inputData.template_id,
@@ -73,7 +93,7 @@ const performBroadcastMessage = async (z, bundle) => {
     media_type,
     media_url,
     schedule_date: bundle.inputData.schedule_date || '',
-    variables: bundle.inputData.variables || '',
+    variables: variables || '',
   };
 
   z.console.log('Broadcast request body:', JSON.stringify(body, null, 2));
@@ -106,22 +126,27 @@ const dynamicTemplateFields = async (z, bundle) => {
   if (!bundle.inputData.template_id) return [];
 
   const token = bundle.authData.api_token;
-  const template = await fetchApi(z, `https://aigreentick.com/api/v1/wa-templates/${bundle.inputData.template_id}`, token);
+  const template = await fetchApi(
+    z,
+    `https://aigreentick.com/api/v1/wa-templates/${bundle.inputData.template_id}`,
+    token
+  );
 
   const { preview } = parseTemplate(template);
   const fields = [];
 
-  // Show preview
+  // Non-editable preview
   if (preview) {
     fields.push({
       key: 'template_preview',
       label: 'Template Preview',
-      type: 'text',
+      type: 'copy',
       helpText: 'Preview of the selected template',
-      default: preview,
+      value: preview,
     });
   }
 
+  // Required variables if placeholders exist
   const body = template?.components?.find(c => c.type === 'BODY');
   const matches = body?.text?.match(/{{\d+}}/g) || [];
   matches.forEach((match, i) => {
@@ -129,13 +154,14 @@ const dynamicTemplateFields = async (z, bundle) => {
       key: `var_${i + 1}`,
       label: `Variable ${i + 1}`,
       type: 'string',
-      required: false,
+      required: true,
       helpText: `Value for ${match}`,
     });
   });
 
   return fields;
 };
+
 
 // ---------- Export ----------
 const broadcastMessage = {
@@ -169,7 +195,7 @@ const broadcastMessage = {
         key: 'camp_name',
         label: 'Campaign Name',
         type: 'string',
-        required: false,
+        required: true,
         helpText: 'Name for this broadcast campaign',
       },
     ],
