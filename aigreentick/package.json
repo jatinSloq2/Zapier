@@ -9,6 +9,7 @@
     "validate": "zapier validate"
   },
   "dependencies": {
+    "libphonenumber-js": "^1.12.16",
     "zapier-platform-core": "17.7.0"
   },
   "devDependencies": {
