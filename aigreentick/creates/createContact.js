@@ -1,15 +1,14 @@
 const performCreateContact = async (z, bundle) => {
   const token = bundle.authData.api_token;
 
+  const attributes = bundle.inputData.attributes || {};
+
   const body = {
     phone_number: bundle.inputData.phone_number,
     name: bundle.inputData.name,
     allowed_broadcast: bundle.inputData.allowed_broadcast || false,
     allowed_sms: bundle.inputData.allowed_sms || false,
-    attributes: {
-      city: bundle.inputData.city || '',
-      company: bundle.inputData.company || '',
-    },
+    attributes,
   };
 
   z.console.log('Create Contact body:', JSON.stringify(body, null, 2));
@@ -42,8 +41,14 @@ const createContact = {
       { key: 'name', label: 'Name', type: 'string', required: true },
       { key: 'allowed_broadcast', label: 'Allow Broadcast', type: 'boolean', required: false },
       { key: 'allowed_sms', label: 'Allow SMS', type: 'boolean', required: false },
-      { key: 'city', label: 'City', type: 'string', required: false },
-      { key: 'company', label: 'Company', type: 'string', required: false },
+
+      {
+        key: 'attributes',
+        label: 'Attributes',
+        helpText: 'Add any number of custom attributes as key-value pairs (e.g., city: Delhi, company: Acme Inc).',
+        dict: true, 
+        required: false,
+      },
     ],
     sample: {
       status: true,
