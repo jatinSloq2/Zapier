@@ -87,7 +87,7 @@ const performBroadcastMessage = async (z, bundle) => {
   const body = {
     template_id: bundle.inputData.template_id,
     country_id,
-    camp_name: bundle.inputData.camp_name || 'Default Campaign',
+    camp_name: bundle.inputData.camp_name || 'ZapierBRDM',
     mobile_numbers,
     is_media,
     media_type,

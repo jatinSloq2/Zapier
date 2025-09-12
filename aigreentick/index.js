@@ -18,6 +18,7 @@ module.exports = {
   creates: {
     [creates.sendMessage.key]: creates.sendMessage,
     [creates.broadcastMessage.key]: creates.broadcastMessage,
+    [creates.createContact.key]: creates.createContact,
   },
 
   resources: { [getTemplates.key]: getTemplates },
