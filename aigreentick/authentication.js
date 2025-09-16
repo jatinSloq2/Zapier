@@ -38,7 +38,8 @@ module.exports = {
       required: true,
       label: 'API Token',
       type: 'string',
-      helpText: 'Your Aigreentick API token from the dashboard. Get it from your account settings.',
+      helpText:
+        'Go to the [API Details](https://account.aigreentick.com/user/api) screen from your Aigreentick dashboard to find your API token.',
     },
   ],
   test: testAuth,

@@ -1,5 +1,3 @@
-// triggers/newContact.js (CommonJS)
-
 const triggerNewContact = async (z, bundle) => {
   const response = await z.request({
     method: 'GET',
@@ -18,17 +16,22 @@ const triggerNewContact = async (z, bundle) => {
 
   const users = response.json?.users?.data || [];
 
-  return users.map((user) => ({
-    id: user.id,
-    name: user.name,
-    mobile: user.mobile,
-    created_at: user.created_at,
-    updated_at: user.updated_at,
-    total_msg_count: user.total_msg_count,
-    last_message_time: user.time,
-  }));
-};
+  return users.map((user) => {
+    const isoLastMessageTime = user.time
+      ? new Date(user.time * 1000).toISOString()
+      : null;
 
+    return {
+      id: user.id,
+      name: user.name,
+      mobile: user.mobile,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      total_msg_count: user.total_msg_count,
+      last_message_time: isoLastMessageTime,
+    };
+  });
+};
 module.exports = {
   key: 'newContact',
   noun: 'Contact',
@@ -59,7 +62,7 @@ module.exports = {
       created_at: '2025-06-24T11:33:56.000000Z',
       updated_at: '2025-06-24T13:15:08.000000Z',
       total_msg_count: 0,
-      last_message_time: 1750763849,
+      last_message_time: '2025-06-24T11:33:56Z',
     },
 
     outputFields: [
@@ -69,7 +72,7 @@ module.exports = {
       { key: 'created_at', label: 'Created At', type: 'datetime' },
       { key: 'updated_at', label: 'Updated At', type: 'datetime' },
       { key: 'total_msg_count', label: 'Total Message Count', type: 'integer' },
-      { key: 'last_message_time', label: 'Last Message Time', type: 'integer' },
+      { key: 'last_message_time', label: 'Last Message Time', type: 'datetime' },
     ],
   },
 };
